@@ -1,6 +1,7 @@
 package main;
 
 import lab1.Lab1Main;
+import lab2.Lab2Main;
 
 public class Main {
 
@@ -26,6 +27,7 @@ public class Main {
     private static Solution getWork(int id){
         return switch (id) {
             case 1 -> new Lab1Main();
+            case 2 -> new Lab2Main();
             default -> throw new IllegalArgumentException(String.format("Work with id = %d doesn't exist", id));
         };
     }

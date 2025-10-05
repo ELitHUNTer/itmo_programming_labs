@@ -2,8 +2,8 @@ package lab1;
 
 import main.Solution;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import static java.lang.Math.*;
 
 public class Lab1Main implements Solution {
@@ -21,7 +21,7 @@ public class Lab1Main implements Solution {
     }
 
     private float getRandom() {
-        return ThreadLocalRandom.current().nextFloat(-9.0f, 14.0f);
+        return new Random().nextFloat(-9.0f, 14.0f);
     }
 
     private double getElement(int i, int j) {
