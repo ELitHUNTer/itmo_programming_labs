@@ -1,6 +1,8 @@
-package lab3.enviroment;
+package lab3.enviroment.ground.fossils;
 
-public class Fossil {
+import lab3.container.Containable;
+
+public class Fossil implements Containable {
 
     private int volume;
 
@@ -8,7 +10,8 @@ public class Fossil {
         this.volume = volume;
     }
 
-    public int getVolume(){
+    @Override
+    public int getWeight() {
         return volume;
     }
 }

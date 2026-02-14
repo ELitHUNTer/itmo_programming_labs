@@ -2,6 +2,7 @@ package main;
 
 import lab1.Lab1Main;
 import lab2.Lab2Main;
+import lab3.Lab3Main;
 
 public class Main {
 
@@ -28,6 +29,7 @@ public class Main {
         return switch (id) {
             case 1 -> new Lab1Main();
             case 2 -> new Lab2Main();
+            case 3 -> new Lab3Main();
             default -> throw new IllegalArgumentException(String.format("Work with id = %d doesn't exist", id));
         };
     }

@@ -1,4 +1,7 @@
 package lab3.entities;
 
-public interface Profession {
+public enum Profession {
+    GEOLOGIST,
+    PILOT,
+    ADVISER;
 }

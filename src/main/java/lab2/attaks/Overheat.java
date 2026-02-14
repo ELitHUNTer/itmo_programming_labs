@@ -11,12 +11,17 @@ public final class Overheat extends SpecialMove {
     }
 
     @Override
-    protected void applySelfEffects(Pokemon pokemon) {
-        pokemon.addEffect(new Effect().turns(-1).stat(Stat.SPECIAL_ATTACK, -2));
+    protected void applyOppEffects(Pokemon pokemon) {
+        pokemon.addEffect(new Effect().turns(-1).stat(Stat.SPECIAL_ATTACK, -6));
     }
 
     @Override
     protected String describe() {
         return "использует Overheat";
+    }
+
+    @Override
+    protected boolean checkAccuracy(Pokemon pokemon, Pokemon pokemon1) {
+        return true;
     }
 }
