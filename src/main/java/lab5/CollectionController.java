@@ -1,20 +1,44 @@
 package lab5;
 
-import lab5.collection_items.Chapter;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import lab5.collection_items.SpaceMarine;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 public class CollectionController {
 
     private Stack<SpaceMarine> stack;
     private LocalDateTime initializationTime;
+    Gson gson = new GsonBuilder()
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+                    return f.getAnnotation(Expose.class) != null;
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> c) {
+                    return false;
+                }
+            })
+            .create();
 
     public CollectionController(){
+        SpaceMarine[] list = gson.fromJson("output.json", SpaceMarine[].class);
         stack = new Stack<>();
+        for (var x: list)
+            stack.push(x);
         initializationTime = LocalDateTime.now();
     }
 
@@ -34,8 +58,11 @@ public class CollectionController {
         stack.set(id, element);
     }
 
-    public void remove(int id){
-        stack.remove(id);
+    public void removeById(int id){
+        stack.stream()
+                .filter(x -> x.getID().equals(id))
+                .findFirst()
+                .ifPresent(spaceMarine -> stack.remove(spaceMarine));
     }
 
     public void clear(){
@@ -43,11 +70,18 @@ public class CollectionController {
     }
 
     public void save(String fileName){
-        // TODO
+
+        List<SpaceMarine> a = new ArrayList<>(stack);
+        String toSave = gson.toJson(a);
+        try (FileWriter fw = new FileWriter(fileName)){
+            fw.write(toSave);
+        } catch (IOException e) {
+            System.err.println("Error occurred when saving to file");
+        }
     }
 
     public void save(){
-        save("output.txt");
+        save("output.json");
     }
 
     public void insertAt(int id, SpaceMarine element){

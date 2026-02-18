@@ -1,5 +1,7 @@
-package lab5;
+package lab5.commands;
 
+import lab5.CollectionController;
+import lab5.IOHelper;
 import lab5.commands.base.CollectionCommand;
 
 public class FilterStartsWithNameCommand extends CollectionCommand {

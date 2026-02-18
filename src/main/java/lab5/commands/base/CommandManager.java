@@ -1,8 +1,7 @@
 package lab5.commands.base;
 
 import lab5.CollectionController;
-import lab5.commands.HelpCommand;
-import lab5.commands.InfoCommand;
+import lab5.commands.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +14,20 @@ public class CommandManager {
         commands = new HashMap<>();
         commands.put("help", new HelpCommand(commands));
         commands.put("info", new InfoCommand(collection));
+        commands.put("show", new ShowCommand(collection));
+        commands.put("add", new AddCommand(collection));
+        commands.put("clear", new ClearCommand(collection));
+        commands.put("count_less_than_chapter", new CountLessThanChapterCommand(collection));
+        commands.put("execute_script", new ExecuteScriptCommand());
+        commands.put("exit", new ExitCommand());
+        commands.put("filter_starts_with_name", new FilterStartsWithNameCommand(collection));
+        commands.put("insert_at", new InsertAtIndexCommand(collection));
+        commands.put("print_field_descending_health", new PrintFieldDescendingHealthCommand(collection));
+        commands.put("remove_by_id", new RemoveByIdCommand(collection));
+        commands.put("remove_greater", new RemoveGreaterCommand(collection));
+        commands.put("remove_last", new RemoveLastCommand(collection));
+        commands.put("save", new SaveCommand(collection));
+        commands.put("update", new UpdateIdCommand(collection));
     }
 
     /**
@@ -29,7 +42,7 @@ public class CommandManager {
         try {
             commands.get(commandName).execute(commandArgs);
         } catch (Exception ex){
-
+            ex.printStackTrace();
         }
     }
 

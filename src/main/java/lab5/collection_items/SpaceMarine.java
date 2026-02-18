@@ -1,11 +1,14 @@
 package lab5.collection_items;
 
+import com.google.gson.annotations.Expose;
+
 import java.time.LocalDate;
 
 public class SpaceMarine implements Comparable<SpaceMarine> {
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
+    @Expose
     private LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     private Double health; //Поле не может быть null, Значение поля должно быть больше 0
     private AstartesCategory category; //Поле может быть null
@@ -80,5 +83,28 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
      */
     public Double getHealth() {
         return health;
+    }
+
+    /**
+     *
+     * @return id of the current SpaceMarine
+     */
+    public Integer getID(){
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "SpaceMarine{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", coordinates=" + coordinates +
+                ", creationDate=" + creationDate +
+                ", health=" + health +
+                ", category=" + category +
+                ", weaponType=" + weaponType +
+                ", meleeWeapon=" + meleeWeapon +
+                ", chapter=" + chapter +
+                '}';
     }
 }

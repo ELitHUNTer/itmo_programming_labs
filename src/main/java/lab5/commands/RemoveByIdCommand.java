@@ -13,7 +13,7 @@ public class RemoveByIdCommand extends CollectionCommand {
     public void execute(String... args) {
         try {
             int id = Integer.parseInt(args[0]);
-            controller.remove(id);
+            controller.removeById(id);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ex){
             throw new IllegalArgumentException("Для работы команды нужно предоставить корректный id элемента");
         }

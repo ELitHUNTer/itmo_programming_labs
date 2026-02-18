@@ -1,6 +1,7 @@
 package lab5.commands;
 
 import lab5.CollectionController;
+import lab5.IOHelper;
 import lab5.commands.base.CollectionCommand;
 
 public class ShowCommand extends CollectionCommand {
@@ -11,7 +12,7 @@ public class ShowCommand extends CollectionCommand {
 
     @Override
     public void execute(String... args) {
-        controller.getCollectionElements().forEach(System.out::println);
+        controller.getCollectionElements().forEach(IOHelper.consoleOut::println);
     }
 
     @Override
