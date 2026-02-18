@@ -2,7 +2,7 @@ package lab5.collection_items;
 
 import java.time.LocalDate;
 
-public class SpaceMarine {
+public class SpaceMarine implements Comparable<SpaceMarine> {
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -46,5 +46,39 @@ public class SpaceMarine {
         this.weaponType = weaponType;
         this.meleeWeapon = meleeWeapon;
         this.chapter = chapter;
+    }
+
+    /**
+     * comparing by id with default Integer comparison
+     * @param o other marine
+     * @return 0 if equal. <0 if this less than other. >0 if this larger that other
+     */
+    @Override
+    public int compareTo(SpaceMarine o) {
+        return Integer.compare(id, o.id);
+    }
+
+    /**
+     *
+     * @return chapter of the current SpaceMarine
+     */
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    /**
+     *
+     * @return name of the current SpaceMarine
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     *
+     * @return health of the current SpaceMarine
+     */
+    public Double getHealth() {
+        return health;
     }
 }
