@@ -18,14 +18,6 @@ public class Lab5Main implements Solution {
     public void solve() {
         CollectionController cc = new CollectionController();
         manager = new CommandManager(cc);
-        try {
-            FileWriter fw = new FileWriter("tmp.txt");
-            fw.write("123");
-            fw.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
 
         while (true){
             try {

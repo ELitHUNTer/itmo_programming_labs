@@ -18,7 +18,7 @@ public class CommandManager {
         commands.put("add", new AddCommand(collection));
         commands.put("clear", new ClearCommand(collection));
         commands.put("count_less_than_chapter", new CountLessThanChapterCommand(collection));
-        commands.put("execute_script", new ExecuteScriptCommand());
+        commands.put("execute_script", new ExecuteScriptCommand(collection));
         commands.put("exit", new ExitCommand());
         commands.put("filter_starts_with_name", new FilterStartsWithNameCommand(collection));
         commands.put("insert_at", new InsertAtIndexCommand(collection));

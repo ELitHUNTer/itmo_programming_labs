@@ -3,9 +3,9 @@ package lab5;
 import lab5.collection_items.*;
 
 import java.io.*;
-import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.function.Predicate;
 
 public class IOHelper {
 
@@ -13,21 +13,67 @@ public class IOHelper {
 
     public static final PrintStream consoleOut = System.out;
     public static final InputStream consoleIn = System.in;
-    public static final InputStream defaultIn = System.in;
+    public static InputStream defaultIn = System.in;
 
+    /**
+     * reads line from stdin
+     * @return line from stdin
+     */
     public static String readConsoleLine(){
-        return sc.nextLine();
+        return getLine(new InputStreamReader(consoleIn)); //sc.nextLine();
     }
 
+    /**
+     * reads line from file
+     * @param fileReader file to readFrom
+     * @return line from file
+     */
+    public static String readFileLine(FileInputStream fileReader)  {
+        return getLine(new InputStreamReader(fileReader));
+    }
+
+    /**
+     * Reads line
+     * @param reader InputStreamReader to read from
+     * @return String until \n on EOF
+     */
+    private static String getLine(InputStreamReader reader){
+        try {
+            StringBuilder sb = new StringBuilder();
+            while (true) {
+                int c = reader.read();
+                if (c == -1 || c == '\n')
+                    break;
+                sb.append((char)c);
+            }
+            return sb.toString().strip();
+        } catch (IOException ex){
+            consoleOut.println("Unknown error. Program terminated");
+            System.exit(-1);
+        }
+        return null;
+    }
+
+    /**
+     * reads SpaceMarine from defaultIn stream
+     * @return SpaceMarine object
+     */
     public static SpaceMarine readMarine(){
         return readMarine(defaultIn);
     }
 
+    /**
+     * reads SpaceMarine from stream
+     * @param readFrom stream to readFrom
+     * @return SpaceMarine object
+     */
     public static SpaceMarine readMarine(InputStream readFrom) {
         try {
             boolean needGreet = readFrom == consoleIn;
             String buff;
-            InputStreamReader reader = new InputStreamReader(readFrom, "UTF-8");
+            InputStreamReader reader;
+            if (readFrom instanceof FileInputStream) reader = new InputStreamReader((FileInputStream)readFrom);
+            else reader = new InputStreamReader(readFrom, "UTF-8");
 
             String name; //Поле не может быть null, Строка не может быть пустой
             Coordinates coordinates; //Поле не может быть null
@@ -40,7 +86,7 @@ public class IOHelper {
             while (true) {
                 if (needGreet) consoleOut.print("Введите имя: ");
                 buff = getLine(reader);
-                if (buff == null || buff.isEmpty())
+                if (needGreet && (buff == null || buff.isEmpty()))
                     continue;
                 name = buff;
                 break;
@@ -53,7 +99,7 @@ public class IOHelper {
                     if (needGreet) consoleOut.print("Введите здоровье(> 0): ");
                     buff = getLine(reader);
                     Double tmp = Double.parseDouble(buff);
-                    if (tmp <= 0)
+                    if (needGreet && tmp <= 0)
                         continue;
                     health = tmp;
                     break;
@@ -101,6 +147,12 @@ public class IOHelper {
         }
     }
 
+    /**
+     * reads Coordinates from stream
+     * @param reader stream to readFrom
+     * @param needGreet indicates if we are reading from console
+     * @return Coordinates object
+     */
     public static Coordinates readCoordinates(InputStreamReader reader, boolean needGreet){
         String buff;
         Long x;
@@ -133,6 +185,12 @@ public class IOHelper {
         return new Coordinates(x, y);
     }
 
+    /**
+     * reads Chapter from stream
+     * @param reader stream to readFrom
+     * @param needGreet indicates if we are reading from console
+     * @return Chapter object
+     */
     public static Chapter readChapter(InputStreamReader reader, boolean needGreet){
         String name, parentLegion;
         Integer marinesCount;
@@ -142,7 +200,7 @@ public class IOHelper {
         while (true) {
             if (needGreet) consoleOut.print("Введите имя главы: ");
             buff = getLine(reader);
-            if (buff == null || buff.isEmpty())
+            if (needGreet && (buff == null || buff.isEmpty()))
                 continue;
             name = buff;
             break;
@@ -156,7 +214,7 @@ public class IOHelper {
                 if (needGreet) consoleOut.print("Введите количество морпехов: ");
                 buff = getLine(reader);
                 Integer tmp = Integer.parseInt(buff);
-                if (tmp < 0 || tmp > 1000)
+                if (needGreet && (tmp < 0 || tmp > 1000))
                     continue;
 
                 marinesCount = tmp;
@@ -168,24 +226,5 @@ public class IOHelper {
 
         return new Chapter(name, parentLegion, marinesCount);
     }
-
-    private static String getLine(InputStreamReader reader){
-        try {
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                int c = reader.read();
-                if (c == -1 || c == '\n')
-                    break;
-                sb.append((char)c);
-            }
-            return sb.toString().strip();
-        } catch (IOException ex){
-            consoleOut.println("Unknown error. Program terminated");
-            System.exit(-1);
-        }
-        return null;
-    }
-
-
 
 }

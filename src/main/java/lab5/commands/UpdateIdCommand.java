@@ -1,6 +1,7 @@
 package lab5.commands;
 
 import lab5.CollectionController;
+import lab5.IOHelper;
 import lab5.commands.base.CollectionCommand;
 
 public class UpdateIdCommand extends CollectionCommand {
@@ -11,7 +12,11 @@ public class UpdateIdCommand extends CollectionCommand {
 
     @Override
     public void execute(String... args) {
-        // TODO
+        if (args.length == 0) return;
+        try {
+            int id = Integer.parseInt(args[0]);
+            controller.updateElement(id, IOHelper.readMarine());
+        } catch (NumberFormatException ex) {}
     }
 
     @Override

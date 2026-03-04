@@ -1,6 +1,8 @@
 package lab5.commands;
 
 import lab5.CollectionController;
+import lab5.IOHelper;
+import lab5.collection_items.SpaceMarine;
 import lab5.commands.base.CollectionCommand;
 
 public class RemoveGreaterCommand extends CollectionCommand {
@@ -11,7 +13,8 @@ public class RemoveGreaterCommand extends CollectionCommand {
 
     @Override
     public void execute(String... args) {
-        // TODO
+        SpaceMarine origin = IOHelper.readMarine();
+        controller.removeGreater(origin);
     }
 
     @Override
