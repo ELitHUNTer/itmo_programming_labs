@@ -1,6 +1,7 @@
 package lab5.commands;
 
 import lab5.CollectionController;
+import lab5.IOHelper;
 import lab5.commands.base.CollectionCommand;
 
 public class RemoveByIdCommand extends CollectionCommand {
@@ -14,8 +15,9 @@ public class RemoveByIdCommand extends CollectionCommand {
         try {
             int id = Integer.parseInt(args[0]);
             controller.removeById(id);
+            IOHelper.printlnIfUsingConsole("Элемент удален");
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ex){
-            throw new IllegalArgumentException("Для работы команды нужно предоставить корректный id элемента");
+            IOHelper.printlnIfUsingConsole("Для работы команды нужно предоставить корректный id элемента");
         }
     }
 

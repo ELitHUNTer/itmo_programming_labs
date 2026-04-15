@@ -16,8 +16,8 @@ public class HelpCommand implements Command {
     public void execute(String... args) {
         StringBuilder builder = new StringBuilder();
         for (var x: commands.entrySet()) {
-            builder.append(x.getKey());
-            builder.append(" ");
+            //builder.append(x.getKey());
+            //builder.append(" ");
             builder.append(x.getValue().getDescription());
             builder.append("\n");
         }
@@ -26,6 +26,6 @@ public class HelpCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "вывести справку по доступным командам";
+        return "help: вывести справку по доступным командам";
     }
 }

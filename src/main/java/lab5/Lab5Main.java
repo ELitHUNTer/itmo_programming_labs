@@ -18,12 +18,16 @@ public class Lab5Main implements Solution {
     public void solve() {
         CollectionController cc = new CollectionController();
         manager = new CommandManager(cc);
+        manager.executeCommand("help");
 
-        while (true){
+        while (true) {
             try {
+                IOHelper.consoleOut.print(">>");
                 manager.executeCommand(IOHelper.readConsoleLine());
             } catch (IllegalArgumentException ex){
                 IOHelper.consoleOut.println(ex.getMessage());
+            } catch (Exception e){
+                System.err.println(e.getMessage());
             }
         }
     }

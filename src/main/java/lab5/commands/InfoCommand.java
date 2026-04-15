@@ -16,6 +16,6 @@ public class InfoCommand extends CollectionCommand {
 
     @Override
     public String getDescription() {
-        return "вывести в стандартный поток вывода информацию о коллекции";
+        return "info: вывести в стандартный поток вывода информацию о коллекции";
     }
 }

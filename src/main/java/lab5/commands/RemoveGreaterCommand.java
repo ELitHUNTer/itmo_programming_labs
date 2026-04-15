@@ -15,6 +15,7 @@ public class RemoveGreaterCommand extends CollectionCommand {
     public void execute(String... args) {
         SpaceMarine origin = IOHelper.readMarine();
         controller.removeGreater(origin);
+        IOHelper.printlnIfUsingConsole("Элементы удалены");
     }
 
     @Override

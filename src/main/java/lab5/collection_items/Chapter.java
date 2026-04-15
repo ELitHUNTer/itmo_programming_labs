@@ -25,4 +25,13 @@ public class Chapter implements Comparable<Chapter>{
     public int compareTo(Chapter o) {
         return name.compareTo(o.name);
     }
+
+    @Override
+    public String toString() {
+        return "Chapter{" +
+                "name='" + name + '\'' +
+                ", parentLegion='" + parentLegion + '\'' +
+                ", marinesCount=" + marinesCount +
+                '}';
+    }
 }

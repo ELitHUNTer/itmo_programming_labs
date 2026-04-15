@@ -1,6 +1,7 @@
 package lab5.commands;
 
 import lab5.CollectionController;
+import lab5.FileReadingException;
 import lab5.IOHelper;
 import lab5.commands.base.CollectionCommand;
 import lab5.commands.base.Command;
@@ -11,7 +12,7 @@ import java.util.HashSet;
 
 public class ExecuteScriptCommand extends CollectionCommand implements Command {
 
-    private HashSet<String> openedFiles = new HashSet<>();
+    private static HashSet<String> openedFiles = new HashSet<>();
 
     public ExecuteScriptCommand(CollectionController controller) {
         super(controller);
@@ -24,23 +25,26 @@ public class ExecuteScriptCommand extends CollectionCommand implements Command {
             System.err.println("Попытка открыть уже открытый файл");
             return;
         }
-        InputStream old = IOHelper.defaultIn;
-        try (FileInputStream reader = new FileInputStream(args[0])) {
+        InputStreamReader old = IOHelper.defaultIn;
+        try (FileInputStream fileReader = new FileInputStream(args[0]);
+        InputStreamReader reader = new InputStreamReader(fileReader)) {
             openedFiles.add(args[0]);
             IOHelper.defaultIn = reader;
             CollectionController newController = new CollectionController();
-            // TODO fix reading from file reads only one line
             CommandManager manager = new CommandManager(newController);
             String command = IOHelper.readFileLine(reader);
             while (!command.isEmpty()) {
-                System.out.println(command);
+                manager.executeCommand(command);
                 command = IOHelper.readFileLine(reader);
             }
             controller.updateCollection(newController);
             IOHelper.consoleOut.println("Скрипт завершен");
         } catch (IOException e) {
+        } catch (FileReadingException e) {
+            IOHelper.errOut.println("Ошибка при чтении файла. Изменения не будут применены");
         } finally {
             IOHelper.defaultIn = old;
+            openedFiles.remove(args[0]);
         }
     }
 

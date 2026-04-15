@@ -1,16 +1,15 @@
 package lab5;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import lab5.collection_items.SpaceMarine;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +24,22 @@ public class CollectionController implements Cloneable {
 
     {
         gson = new GsonBuilder()
-                .setExclusionStrategies(new ExclusionStrategy() {
-                    @Override
-                    public boolean shouldSkipField(FieldAttributes f) {
-                        return f.getAnnotation(Expose.class) != null;
-                    }
+                .registerTypeAdapter(
+                        LocalDate.class,
+                        new TypeAdapter<LocalDate>(){
 
-                    @Override
-                    public boolean shouldSkipClass(Class<?> c) {
-                        return false;
-                    }
-                })
-                .create();
+                            @Override
+                            public void write(JsonWriter jsonWriter, LocalDate localDate) throws IOException {
+                                jsonWriter.value(localDate.toString());
+                            }
+
+                            @Override
+                            public LocalDate read(JsonReader jsonReader) throws IOException {
+                                return LocalDate.parse(jsonReader.nextString());
+                            }
+                        }
+                )
+                .registerTypeAdapter(SpaceMarine.class, new SpaceMarine.Adapter()).create();
     }
 
     public CollectionController(){
@@ -50,16 +53,26 @@ public class CollectionController implements Cloneable {
         initializationTime = copy.initializationTime;
     }
 
+    public boolean containsElementWithId(int id){
+        return getCollectionElements().stream().filter(x -> x.getID() == id).count() == 1;
+    }
+
     /**
      * reads collection from file collection.json if present
      */
     private void readCollection(){
-        File collectionFile = new File("collection.json");
+        String fileName = System.getenv("FILE_PROG_LAB_5");
+        if (fileName == null) {
+            IOHelper.errOut.println("Please provide file name via FILE_PROG_LAB_5 environment variable");
+            System.exit(0);
+        }
+        File collectionFile = new File(fileName);
         if (collectionFile.exists()) {
             Type type = new TypeToken<List<SpaceMarine>>(){}.getType();
             try {
                 InputStreamReader reader = new InputStreamReader(new FileInputStream(collectionFile));
                 List<SpaceMarine> list = gson.fromJson(reader, type);
+                if (list == null) return;
                 for (var x : list)
                     stack.push(x);
             } catch (FileNotFoundException e) {
@@ -99,7 +112,7 @@ public class CollectionController implements Cloneable {
     public void updateElement(int id, SpaceMarine element){
         for (int i = 0; i < stack.size(); i++)
             if (stack.get(i).getID() == id) {
-                stack.set(i, element);
+                stack.get(i).update(element);
                 break;
             }
     }
@@ -155,8 +168,8 @@ public class CollectionController implements Cloneable {
     /**
      * removes last element from collection
      */
-    public void remove_last(){
-        stack.pop();
+    public SpaceMarine remove_last(){
+        return stack.pop();
     }
 
     /**
@@ -164,7 +177,8 @@ public class CollectionController implements Cloneable {
      * @param element pivot to compare
      */
     public void removeGreater(SpaceMarine element){
-        stack.removeAll(stack.stream().filter(x -> x.compareTo(element) > 0).toList());
+        List<SpaceMarine> list = stack.stream().filter(x -> x.compareTo(element) > 0).toList();
+        stack.removeAll(list);
     }
 
     /**

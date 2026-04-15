@@ -17,7 +17,7 @@ public class FilterStartsWithNameCommand extends CollectionCommand {
                     .filter(x -> x.getName().startsWith(args[0]))
                     .forEach(IOHelper.consoleOut::println);
         } catch (ArrayIndexOutOfBoundsException ex){
-            throw new IllegalArgumentException("name - строка и обязательный параметр");
+            IOHelper.printlnIfUsingConsole("name - строка и обязательный параметр");
         }
     }
 
