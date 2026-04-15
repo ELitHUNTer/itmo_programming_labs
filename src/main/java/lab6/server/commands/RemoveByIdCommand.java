@@ -1,0 +1,31 @@
+package lab6.server.commands;
+
+import lab6.server.CollectionController;
+import lab6.server.IOHelper;
+import lab6.server.commands.base.CollectionCommand;
+
+public class RemoveByIdCommand extends CollectionCommand {
+
+    public RemoveByIdCommand(CollectionController controller) {
+        super(controller);
+    }
+
+    @Override
+    public String execute(String... args) {
+        try {
+
+            int id = Integer.parseInt(args[0]);
+            controller.removeById(id);
+            //IOHelper.printlnIfUsingConsole("Элемент удален");
+            return "Элемент удален";
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException ex){
+            //IOHelper.printlnIfUsingConsole("Для работы команды нужно предоставить корректный id элемента");
+            return "Для работы команды нужно предоставить корректный id элемента";
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return "remove_by_id id : удалить элемент из коллекции по его id";
+    }
+}

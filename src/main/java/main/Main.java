@@ -4,6 +4,7 @@ import lab1.Lab1Main;
 import lab2.Lab2Main;
 import lab3.Lab3Main;
 import lab5.Lab5Main;
+import lab6.Lab6Main;
 
 public class Main {
 
@@ -17,7 +18,7 @@ public class Main {
             System.exit(0);
         }
         try {
-            Solution solution = getWork(Integer.parseInt(args[0]));
+            Solution solution = getWork(args[0]);
             solution.solve();
         } catch (NumberFormatException ex){
             System.out.printf("Can't parse \"%s\" to integer", args[0]);
@@ -26,12 +27,14 @@ public class Main {
         }
     }
 
-    private static Solution getWork(int id){
+    private static Solution getWork(String id){
         return switch (id) {
-            case 1 -> new Lab1Main();
-            case 2 -> new Lab2Main();
-            case 3,4 -> new Lab3Main();
-            case 5 -> new Lab5Main();
+            case "1" -> new Lab1Main();
+            case "2" -> new Lab2Main();
+            case "3","4" -> new Lab3Main();
+            case "5" -> new Lab5Main();
+            case "6c" -> new Lab6Main(false);
+            case "6s" -> new Lab6Main(true);
             default -> throw new IllegalArgumentException(String.format("Work with id = %d doesn't exist", id));
         };
     }

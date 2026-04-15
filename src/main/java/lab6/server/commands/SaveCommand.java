@@ -1,0 +1,30 @@
+package lab6.server.commands;
+
+import lab6.server.CollectionController;
+import lab6.server.commands.base.CollectionCommand;
+
+import java.util.Arrays;
+
+public class SaveCommand extends CollectionCommand {
+
+    public SaveCommand(CollectionController controller) {
+        super(controller);
+    }
+
+    @Override
+    public String execute(String... args) {
+        StringBuilder sb = new StringBuilder();
+        //Arrays.stream(args).forEach(System.out::println);
+        Arrays.stream(args).forEach(sb::append);
+        if (args.length != 0)
+            controller.save(args[0]);
+        else
+            controller.save();
+        return sb.toString();
+    }
+
+    @Override
+    public String getDescription() {
+        return "save : сохранить коллекцию в файл";
+    }
+}
