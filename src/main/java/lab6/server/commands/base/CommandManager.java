@@ -1,7 +1,10 @@
 package lab6.server.commands.base;
 
 import lab6.server.CollectionController;
+import lab6.server.collection_items.SpaceMarine;
 import lab6.server.commands.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +12,7 @@ import java.util.HashMap;
 public class CommandManager {
 
     private HashMap<String, Command> commands;
+    private final Logger logger = LoggerFactory.getLogger(CommandManager.class);
 
     public CommandManager(CollectionController collection){
         commands = new HashMap<>();
@@ -18,7 +22,7 @@ public class CommandManager {
         commands.put("add", new AddCommand(collection));
         commands.put("clear", new ClearCommand(collection));
         commands.put("count_less_than_chapter", new CountLessThanChapterCommand(collection));
-        commands.put("execute_script", new ExecuteScriptCommand(collection));
+        //commands.put("execute_script", new ExecuteScriptCommand(collection));
         commands.put("exit", new ExitCommand());
         commands.put("filter_starts_with_name", new FilterStartsWithNameCommand(collection));
         commands.put("insert_at", new InsertAtIndexCommand(collection));
@@ -28,6 +32,22 @@ public class CommandManager {
         commands.put("remove_last", new RemoveLastCommand(collection));
         commands.put("save", new SaveCommand(collection));
         commands.put("update", new UpdateIdCommand(collection));
+        commands.put("u?", new Command() {
+            @Override
+            public String execute(String... args) {
+                StringBuilder sb = new StringBuilder();
+                collection.getCollectionElements().stream().map(SpaceMarine::getID).forEach(x -> sb.append(x).append(" "));
+                return sb.toString();
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        commands.keySet().stream().filter(x -> !x.equals("u?")).forEach(x -> sb.append(x).append(", "));
+        logger.info("Зарегистрированы команды: " + sb);
     }
 
     /**
@@ -39,13 +59,17 @@ public class CommandManager {
         if (!commands.containsKey(commandName) || commandName.equals("save"))
             //throw new IllegalArgumentException("No command found for name " + commandName + ". Please type help for help");
             return "No command found for name " + commandName + ". Please type help for help";
-
+        logger.info("Provided command: " + commandName);
         try {
             return commands.get(commandName).execute(commandArgs);
         } catch (Exception ex){
             //ex.printStackTrace();
             return ex.getMessage();
         }
+    }
+
+    public String executeSaveForServer(String... commandArgs){
+        return commands.get("save").execute(commandArgs);
     }
 
     /**

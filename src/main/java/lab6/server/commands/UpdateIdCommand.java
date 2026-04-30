@@ -2,6 +2,7 @@ package lab6.server.commands;
 
 import lab6.server.CollectionController;
 import lab6.server.IOHelper;
+import lab6.server.MyGsonFactory;
 import lab6.server.collection_items.SpaceMarine;
 import lab6.server.commands.base.CollectionCommand;
 
@@ -18,7 +19,8 @@ public class UpdateIdCommand extends CollectionCommand {
             int id = Integer.parseInt(args[0]);
             //if (id < 0 || id > controller.getCollectionSize()) throw new NumberFormatException("");
             if (id < 0 || !controller.containsElementWithId(id)) throw new NumberFormatException("");
-            SpaceMarine marine = IOHelper.readMarine();
+            //SpaceMarine marine = IOHelper.readMarine();
+            SpaceMarine marine = new SpaceMarine(MyGsonFactory.get().fromJson(args[1], SpaceMarine.class));
             controller.updateElement(id, marine);
 //            IOHelper.printlnIfUsingConsole(String.format("Элемент %s обновлен на позиции %d",
 //                    controller.getCollectionElements().stream().filter(x -> x.getID() == id).findFirst(),

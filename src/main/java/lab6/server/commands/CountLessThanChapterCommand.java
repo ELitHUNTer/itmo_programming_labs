@@ -1,5 +1,6 @@
 package lab6.server.commands;
 
+import com.google.gson.Gson;
 import lab6.server.CollectionController;
 import lab6.server.IOHelper;
 import lab6.server.collection_items.Chapter;
@@ -14,7 +15,8 @@ public class CountLessThanChapterCommand extends CollectionCommand {
     @Override
     public String execute(String... args) {
         try {
-            Chapter base = new Chapter(args[0], args[1], Integer.parseInt(args[2]));
+            //Chapter base = new Chapter(args[0], args[1], Integer.parseInt(args[2]));
+            Chapter base = new Gson().fromJson(args[0], Chapter.class);
             Long ans = controller.getCollectionElements().stream().filter(x -> x.getChapter().compareTo(base) < 0).count();
             //IOHelper.consoleOut.println(ans);
             return ans.toString();

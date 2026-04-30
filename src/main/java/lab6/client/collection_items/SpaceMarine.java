@@ -122,7 +122,7 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
                 ", weaponType=" + weaponType +
                 ", meleeWeapon=" + meleeWeapon +
                 ", chapter=" + chapter +
-                '}';
+                "}";
     }
 
     private static HashSet<Integer> usedID = new HashSet<>();

@@ -3,10 +3,15 @@ package lab6.server.commands;
 import lab6.server.CollectionController;
 import lab6.server.IOHelper;
 import lab6.server.MyGsonFactory;
+import lab6.server.ServerMain;
 import lab6.server.collection_items.SpaceMarine;
 import lab6.server.commands.base.CollectionCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AddCommand extends CollectionCommand {
+
+    private Logger logger = LoggerFactory.getLogger(AddCommand.class);
 
     public AddCommand(CollectionController controller) {
         super(controller);

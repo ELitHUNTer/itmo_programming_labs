@@ -110,6 +110,8 @@ public class IOHelper {
             try {
                 if (needGreet) consoleOut.print(">>> Введите категорию(SCOUT, AGGRESSOR, SUPPRESSOR, TACTICAL, TERMINATOR): ");
                 buff = getLine(reader).toUpperCase();
+                if (buff.isEmpty())
+                    buff = "SCOUT";
                 category = AstartesCategory.valueOf(buff);
                 break;
             } catch (IllegalArgumentException ex){
@@ -120,6 +122,8 @@ public class IOHelper {
             try {
                 if (needGreet) consoleOut.print(">>> Введите тип оружия(MELTAGUN, GRAV_GUN, GRENADE_LAUNCHER): ");
                 buff = getLine(reader).toUpperCase();
+                if (buff.isEmpty())
+                    buff = "MELTAGUN";
                 weaponType = Weapon.valueOf(buff);
                 break;
             } catch (IllegalArgumentException ex){
@@ -130,6 +134,8 @@ public class IOHelper {
             try {
                 if (needGreet) consoleOut.print(">>> Введите оружие ближнего боя(CHAIN_SWORD, POWER_SWORD, CHAIN_AXE, MANREAPER, POWER_BLADE): ");
                 buff = getLine(reader).toUpperCase();
+                if (buff.isEmpty())
+                    buff = "CHAIN_SWORD";
                 meleeWeapon = MeleeWeapon.valueOf(buff);
                 break;
             } catch (IllegalArgumentException ex){

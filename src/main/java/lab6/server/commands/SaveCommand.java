@@ -15,12 +15,12 @@ public class SaveCommand extends CollectionCommand {
     public String execute(String... args) {
         StringBuilder sb = new StringBuilder();
         //Arrays.stream(args).forEach(System.out::println);
-        Arrays.stream(args).forEach(sb::append);
+        //Arrays.stream(args).forEach(sb::append);
         if (args.length != 0)
             controller.save(args[0]);
         else
             controller.save();
-        return sb.toString();
+        return "Коллекция сохранена";
     }
 
     @Override

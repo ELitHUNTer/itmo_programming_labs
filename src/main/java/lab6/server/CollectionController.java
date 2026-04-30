@@ -7,6 +7,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import lab6.server.collection_items.SpaceMarine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -21,6 +23,7 @@ public class CollectionController implements Cloneable {
     private Stack<SpaceMarine> stack;
     private LocalDateTime initializationTime;
     private Gson gson;
+    private Logger logger = LoggerFactory.getLogger(CollectionController.class);
 
     {
         gson = new GsonBuilder()
@@ -63,7 +66,7 @@ public class CollectionController implements Cloneable {
     private void readCollection(){
         String fileName = System.getenv("FILE_PROG_LAB_5");
         if (fileName == null) {
-            IOHelper.errOut.println("Please provide file name via FILE_PROG_LAB_5 environment variable");
+            logger.error("Please provide file name via FILE_PROG_LAB_5 environment variable");
             System.exit(0);
         }
         File collectionFile = new File(fileName);
@@ -145,7 +148,7 @@ public class CollectionController implements Cloneable {
         try (FileWriter fw = new FileWriter(fileName)){
             fw.write(toSave);
         } catch (IOException e) {
-            System.err.println("Error occurred when saving to file");
+            logger.error("Error occurred when saving to file");
         }
     }
 
