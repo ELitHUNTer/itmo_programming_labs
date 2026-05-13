@@ -12,7 +12,7 @@ public class UpdateIdCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         if (args.length == 0) return "";
         try {
             int id = Integer.parseInt(args[0]);
@@ -20,7 +20,7 @@ public class UpdateIdCommand extends CollectionCommand {
             if (id < 0 || !controller.containsElementWithId(id)) throw new NumberFormatException("");
             //SpaceMarine marine = IOHelper.readMarine();
             SpaceMarine marine = new SpaceMarine(MyGsonFactory.get().fromJson(args[1], SpaceMarine.class));
-            controller.updateElement(id, marine);
+            controller.updateElement(id, marine, userName);
 //            IOHelper.printlnIfUsingConsole(String.format("Элемент %s обновлен на позиции %d",
 //                    controller.getCollectionElements().stream().filter(x -> x.getID() == id).findFirst(),
 //                    id));

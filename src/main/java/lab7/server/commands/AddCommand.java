@@ -1,6 +1,7 @@
 package lab7.server.commands;
 
 import lab7.server.CollectionController;
+import lab7.server.DataBaseManager;
 import lab7.server.MyGsonFactory;
 import lab7.collectionItems.SpaceMarine;
 import lab7.server.commands.base.CollectionCommand;
@@ -16,9 +17,10 @@ public class AddCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String user_name, String... args) {
         try {
             SpaceMarine marine = new SpaceMarine(MyGsonFactory.get().fromJson(args[0], SpaceMarine.class));
+            marine.setOwner(user_name);
             controller.addElement(marine);
             //IOHelper.printlnIfUsingConsole(String.format("Добавлен элемент %s", marine));
             return String.format("Добавлен элемент %s", marine);

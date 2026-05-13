@@ -3,6 +3,7 @@ package lab7.server;
 import com.google.gson.Gson;
 import lab5.IOHelper;
 import lab7.server.commands.base.CommandManager;
+import lab7.utils.ClientRequest;
 import lab7.utils.Config;
 import lab7.utils.DatagramChunk;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class ServerMain implements Runnable {
     private ExecutorService readExecutor;
     private ExecutorService serverConsoleExecutor;
     private final int PORT;
+    private DataBaseManager DBManager;
 
     private CommandManager manager;
 
@@ -34,7 +36,7 @@ public class ServerMain implements Runnable {
         processExecutor = Executors.newCachedThreadPool();
         readExecutor = Executors.newCachedThreadPool();
 
-        DataBaseManager DBManager = new DataBaseManager();
+        DBManager = DataBaseManager.getInstance();
         CollectionController cc = new CollectionController(DBManager);
         manager = new CommandManager(cc);
         serverConsoleExecutor = Executors.newSingleThreadExecutor();
@@ -48,11 +50,11 @@ public class ServerMain implements Runnable {
                 try {
                     IOHelper.consoleOut.print(">>");
                     String consoleLine = IOHelper.readConsoleLine();
-                    if (consoleLine.equals("save")) {
-                        logger.info(manager.executeSaveForServer());
-                        continue;
-                    }
-                    logger.info(manager.executeCommand(consoleLine));
+//                    if (consoleLine.equals("save")) {
+//                        logger.info(manager.executeSaveForServer());
+//                        continue;
+//                    }
+                    logger.info(manager.executeCommand("", consoleLine));
                 } catch (IllegalArgumentException ex){
                     IOHelper.consoleOut.println(ex.getMessage());
                 } catch (Exception e){
@@ -97,7 +99,9 @@ public class ServerMain implements Runnable {
                             StringBuilder builder = new StringBuilder();
                             for (DatagramChunk c : receivedChunks.get(chunk.getTransactionId()))
                                 builder.append(new String(c.getData()));
-                            processExecutor.submit(new ServerConnectionTask(serverSocket, receivePacket, manager, builder.toString()));
+                            ClientRequest request = gson.fromJson(builder.toString().trim(), ClientRequest.class);
+                            System.out.println("ПИДАРАСЫ");
+                            processExecutor.submit(new ServerConnectionTask(serverSocket, receivePacket, manager, request, DBManager));
                             receivedChunks.get(chunk.getTransactionId()).clear();
                         }
                     }

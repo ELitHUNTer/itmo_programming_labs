@@ -13,7 +13,7 @@ public class PrintFieldDescendingHealthCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         StringBuilder sb = new StringBuilder();
         controller.getCollectionElements().stream()
                 .sorted(Comparator.comparing(SpaceMarine::getHealth))

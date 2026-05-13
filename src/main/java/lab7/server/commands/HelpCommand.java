@@ -13,7 +13,7 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         StringBuilder builder = new StringBuilder();
         for (var x: commands.entrySet()) {
             //builder.append(x.getKey());

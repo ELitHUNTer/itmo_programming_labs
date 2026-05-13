@@ -15,11 +15,16 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
     private Weapon weaponType;
     private MeleeWeapon meleeWeapon;
     private Chapter chapter;
+    private String owner; // Имя пользователя-владельца объекта
+
+    public void setOwner(String s){
+        owner = s;
+    }
 
     // Конструктор для создания нового объекта (ID генерируется снаружи или сервисом)
     public SpaceMarine(Integer id, String name, Coordinates coordinates, LocalDate creationDate,
                        Double health, AstartesCategory category, Weapon weaponType,
-                       MeleeWeapon meleeWeapon, Chapter chapter) {
+                       MeleeWeapon meleeWeapon, Chapter chapter, String owner) {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException("name must not be null or empty string");
         if (coordinates == null)
@@ -28,6 +33,8 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
             throw new IllegalArgumentException("health must not be null and be > 0");
         if (weaponType == null)
             throw new IllegalArgumentException("weapon mustn't be null");
+        if (owner == null || owner.isEmpty())
+            throw new IllegalArgumentException("owner must not be null or empty string");
 
         this.id = id;
         this.name = name;
@@ -38,18 +45,29 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
         this.weaponType = weaponType;
         this.meleeWeapon = meleeWeapon;
         this.chapter = chapter;
+        this.owner = owner;
     }
 
     public SpaceMarine(String name, Coordinates coordinates,
                        Double health, AstartesCategory category, Weapon weaponType,
-                       MeleeWeapon meleeWeapon, Chapter chapter){
-        this(IdGenerator.getInstance().generateId(), name, coordinates, LocalDate.now(), health, category, weaponType, meleeWeapon, chapter);
+                       MeleeWeapon meleeWeapon, Chapter chapter, String owner){
+        this(IdGenerator.getInstance().generateId(), name, coordinates, LocalDate.now(),
+                health, category, weaponType, meleeWeapon, chapter, owner);
     }
 
+    /**
+     * Конструктор копирования. Копирует все поля, включая owner.
+     */
     public SpaceMarine(SpaceMarine other) {
-        this(other.id, other.name, other.coordinates, other.creationDate, other.health, other.category, other.weaponType, other.meleeWeapon, other.chapter);
+        this(other.id, other.name, other.coordinates, other.creationDate, other.health,
+                other.category, other.weaponType, other.meleeWeapon, other.chapter, other.owner);
     }
 
+    /**
+     * Обновляет изменяемые поля объекта из другого SpaceMarine.
+     * Поле owner НЕ обновляется — имущественные права нельзя передать через update.
+     * Поле id и creationDate также не изменяются.
+     */
     public void update(SpaceMarine other) {
         this.health = other.health;
         this.category = other.category;
@@ -59,6 +77,7 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
         this.name = other.name;
         this.coordinates = other.coordinates;
         this.creationDate = other.creationDate;
+        // owner НЕ обновляется — хозяин не меняется при update
     }
 
     @Override
@@ -75,6 +94,7 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
     public Weapon getWeaponType() { return weaponType; }
     public MeleeWeapon getMeleeWeapon() { return meleeWeapon; }
     public Chapter getChapter() { return chapter; }
+    public String getOwner() { return owner; }
 
     @Override
     public String toString() {
@@ -88,6 +108,7 @@ public class SpaceMarine implements Comparable<SpaceMarine> {
                 ", weaponType=" + weaponType +
                 ", meleeWeapon=" + meleeWeapon +
                 ", chapter=" + chapter +
+                ", owner='" + owner + '\'' +
                 '}';
     }
 

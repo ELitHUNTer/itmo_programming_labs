@@ -9,6 +9,7 @@ import lab7.collectionItems.Chapter;
 import lab7.collectionItems.SpaceMarine;
 import lab7.collectionItems.utils.IdGenerator;
 import lab7.collectionItems.utils.SpaceMarineAdapter;
+import lab7.utils.ClientRequest;
 import lab7.utils.DatagramChunk;
 import lab7.utils.FileReadingException;
 import lab7.utils.IOHelper;
@@ -57,7 +58,8 @@ public class ClientMain implements Runnable{
                     while (!command.isEmpty()) {
                         String message = handleCommand(command);
                         if (message == null) continue;
-                        sendToServer(message);
+                        ClientRequest request = new ClientRequest(login, password, message);
+                        sendToServer(request);
                         //command = IOHelper.readFileLine(reader);
                         command = IOHelper.readLine();
                     }
@@ -76,7 +78,7 @@ public class ClientMain implements Runnable{
     private Scanner sc;
     private Selector selector;
 
-    private String login = null, password = null;
+    private String login = "unidentified_user", password = "unidentified_user";
     //private Logger logger = LoggerFactory.getLogger(ClientMain.class);
 
     {
@@ -117,7 +119,8 @@ public class ClientMain implements Runnable{
                 //String message = handleCommand(sc.nextLine(), IOHelper.consoleIn);
                 String message = handleCommand(IOHelper.readLine());
                 if (message == null) continue;
-                sendToServer(message);
+                ClientRequest request = new ClientRequest(login, BCrypt.hashpw(password, BCrypt.gensalt()), message);
+                sendToServer(request);
                 IOHelper.consoleOut.print(">>");
             }
 
@@ -126,8 +129,9 @@ public class ClientMain implements Runnable{
         }
     }
 
-    private void sendToServer(String message) throws IOException {
-        message = login + " " + password + " " + message;
+    private void sendToServer(ClientRequest request) throws IOException {
+        String message = gson.toJson(request);
+        System.out.println(message);
         DatagramChunk[] chunks = DatagramChunk.split(message);
         InetSocketAddress serverAddress = new InetSocketAddress(SERVER_HOST, SERVER_PORT);
         for (DatagramChunk chunk : chunks) {
@@ -317,8 +321,17 @@ public class ClientMain implements Runnable{
             case "add":
             case "remove_greater":
                 SpaceMarine marine = IOHelper.readMarine();
+                marine.setOwner(login);
+                System.out.println(gson.toJson(marine));
                 ret.add(gson.toJson(marine));
                 //logger.info(String.format("Добавлен аргумент %s к команде %s", gson.toJson(marine), parsedCommand[0]));
+                break;
+            case "login":
+            case "register":
+                login = parsedCommand[1];
+                password = parsedCommand[2];
+                ret.add(parsedCommand[1]);
+                ret.add(BCrypt.hashpw(password, BCrypt));
                 break;
         }
         return ret;

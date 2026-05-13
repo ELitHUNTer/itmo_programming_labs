@@ -12,7 +12,7 @@ public class CountLessThanChapterCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         try {
             //Chapter base = new Chapter(args[0], args[1], Integer.parseInt(args[2]));
             Chapter base = new Gson().fromJson(args[0], Chapter.class);

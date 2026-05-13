@@ -12,7 +12,7 @@ public class InsertAtIndexCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         if (args.length == 0) return "";
         try {
             int id = Integer.parseInt(args[0]);

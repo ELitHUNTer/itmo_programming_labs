@@ -11,8 +11,8 @@ public class RemoveLastCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
-        SpaceMarine marine = controller.remove_last();
+    public String execute(String userName, String... args) {
+        SpaceMarine marine = controller.remove_last(userName);
         //IOHelper.printlnIfUsingConsole(String.format("Элемент %s удален", marine));
         return String.format("Элемент %s удален", marine);
     }

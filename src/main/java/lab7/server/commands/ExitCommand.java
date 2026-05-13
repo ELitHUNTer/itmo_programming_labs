@@ -4,7 +4,7 @@ import lab7.server.commands.base.Command;
 
 public class ExitCommand implements Command {
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         System.exit(-1);
         return "";
     }

@@ -10,7 +10,7 @@ public class SaveCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         StringBuilder sb = new StringBuilder();
         //Arrays.stream(args).forEach(System.out::println);
         //Arrays.stream(args).forEach(sb::append);

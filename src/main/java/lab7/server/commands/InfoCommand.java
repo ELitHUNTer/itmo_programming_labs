@@ -10,7 +10,7 @@ public class InfoCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         //System.out.println(controller.getCollectionInfo());
         return controller.getCollectionInfo();
     }

@@ -3,6 +3,7 @@ package lab7.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import lab7.collectionItems.SpaceMarine;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -73,8 +75,7 @@ public class CollectionController implements Cloneable {
 
     /**
      * Загружает коллекцию из БД при старте программы.
-     * После загрузки синхронизирует IdGenerator с максимальным id в БД,
-     * чтобы новые объекты получали уникальные id.
+     * Синхронизирует IdGenerator с максимальным id.
      */
     private void readCollection(){
         List<SpaceMarine> marines = dbManager.loadAllSpaceMarines();
@@ -92,7 +93,7 @@ public class CollectionController implements Cloneable {
     }
 
     /**
-     * @return defensive copy (снимок) текущих элементов. Клиент может безопасно итерировать его без блокировок.
+     * @return defensive copy (снимок) текущих элементов.
      */
     public List<SpaceMarine> getCollectionElements(){
         synchronized (monitor) {
@@ -100,11 +101,17 @@ public class CollectionController implements Cloneable {
         }
     }
 
+    // ============================================================
+    //  Методы, создающие новые объекты (owner записывается, проверка не нужна)
+    // ============================================================
+
     /**
-     * Добавить элемент: сначала в БД, при успехе — в память.
+     * Добавить элемент в коллекцию. Owner берётся из самого объекта SpaceMarine.
+     * Сначала INSERT в БД, при успехе — добавление в память.
      */
     public void addElement(SpaceMarine x){
-        if (dbManager.insertSpaceMarine(x)) {
+        int ordernum = dbManager.getMaxOrdernum() + 1;
+        if (dbManager.insertSpaceMarine(x, ordernum)) {
             stack.add(x);
         } else {
             throw new RuntimeException("Не удалось добавить SpaceMarine в БД. Изменения в памяти отменены.");
@@ -112,62 +119,16 @@ public class CollectionController implements Cloneable {
     }
 
     /**
-     * Обновить элемент: сначала в БД, при успехе — в памяти.
-     */
-    public void updateElement(int id, SpaceMarine element){
-        synchronized (monitor) {
-            if (dbManager.updateSpaceMarine(element)) {
-                for (int i = 0; i < stack.size(); i++) {
-                    if (stack.get(i).getID() == id) {
-                        stack.get(i).update(element);
-                        break;
-                    }
-                }
-            } else {
-                throw new RuntimeException("Не удалось обновить SpaceMarine id=" + id + " в БД.");
-            }
-        }
-    }
-
-    /**
-     * Удалить по id: сначала из БД, при успехе — из памяти.
-     */
-    public void removeById(int id){
-        synchronized (monitor) {
-            if (dbManager.deleteSpaceMarineById(id)) {
-                stack.stream()
-                        .filter(x -> x.getID().equals(id))
-                        .findFirst()
-                        .ifPresent(spaceMarine -> stack.remove(spaceMarine));
-            } else {
-                throw new RuntimeException("Не удалось удалить SpaceMarine id=" + id + " из БД.");
-            }
-        }
-    }
-
-    /**
-     * Очистить коллекцию: сначала удалить все из БД, затем очистить память.
-     */
-    public void clear(){
-        dbManager.deleteAllSpaceMarines();
-        stack.clear();
-    }
-
-    public void save(String fileName){
-        logger.info("save() вызван. При использовании БД коллекция сохраняется автоматически.");
-    }
-
-    public void save(){
-        save(null);
-    }
-
-    /**
-     * Вставить элемент на позицию index: сначала сдвинуть ordernum в БД,
-     * затем вставить запись. При успехе — добавить в память.
+     * Вставить элемент на позицию index. Owner берётся из объекта.
+     * Сначала сдвиг ordernum в БД, затем INSERT, при успехе — в память.
      */
     public void insertAt(int index, SpaceMarine element){
         synchronized (monitor) {
-            if (dbManager.insertSpaceMarine(element)) {
+            int shiftResult = dbManager.shiftOrdernumsUpFrom(index);
+            if (shiftResult < 0) {
+                throw new RuntimeException("Не удалось сдвинуть ordernum в БД для insertAt.");
+            }
+            if (dbManager.insertSpaceMarine(element, index)) {
                 stack.add(index, element);
             } else {
                 throw new RuntimeException("Не удалось вставить SpaceMarine в БД на позицию " + index);
@@ -175,16 +136,80 @@ public class CollectionController implements Cloneable {
         }
     }
 
+    // ============================================================
+    //  Методы, изменяющие существующие объекты (требуется проверка хозяина)
+    // ============================================================
+
     /**
-     * Удалить последний элемент (pop): сначала из БД, при успехе — из памяти.
+     * Обновить элемент по id.
+     * Изменить может только хозяин объекта.
+     * Сначала UPDATE в БД (с проверкой owner), при успехе — update в памяти.
+     *
+     * @param id      id обновляемого элемента
+     * @param element новые данные (owner из element должен совпадать с текущим хозяином)
+     * @param owner   имя пользователя, выполняющего операцию
+     * @throws SecurityException если owner не совпадает с хозяином объекта
      */
-    public SpaceMarine remove_last(){
+    public void updateElement(int id, SpaceMarine element, String owner){
+        synchronized (monitor) {
+            SpaceMarine existing = findElementById(id);
+            if (existing == null) {
+                throw new RuntimeException("SpaceMarine id=" + id + " не найден.");
+            }
+            checkOwnership(existing, owner, "update", id);
+
+            if (dbManager.updateSpaceMarine(existing)) {
+                existing.update(element);
+            } else {
+                throw new RuntimeException("Не удалось обновить SpaceMarine id=" + id + " в БД.");
+            }
+        }
+    }
+
+    /**
+     * Удалить элемент по id.
+     * Удалить может только хозяин объекта.
+     * Сначала DELETE из БД (с проверкой owner), при успехе — удаление из памяти.
+     *
+     * @param id    id удаляемого элемента
+     * @param owner имя пользователя, выполняющего операцию
+     * @throws SecurityException если owner не совпадает с хозяином объекта
+     */
+    public void removeById(int id, String owner){
+        synchronized (monitor) {
+            SpaceMarine existing = findElementById(id);
+            if (existing == null) {
+                throw new RuntimeException("SpaceMarine id=" + id + " не найден.");
+            }
+            checkOwnership(existing, owner, "remove", id);
+
+            if (dbManager.deleteSpaceMarineById(id, owner)) {
+                stack.removeIf(x -> x.getID().equals(id));
+            } else {
+                throw new RuntimeException("Не удалось удалить SpaceMarine id=" + id + " из БД.");
+            }
+        }
+    }
+
+    /**
+     * Удалить последний элемент (pop).
+     * Удалить может только хозяин последнего элемента.
+     * Сначала DELETE из БД (с проверкой owner), при успехе — удаление из памяти.
+     *
+     * @param owner имя пользователя, выполняющего операцию
+     * @return удалённый SpaceMarine
+     * @throws SecurityException  если owner не совпадает с хозяином последнего элемента
+     * @throws EmptyStackException если стек пуст
+     */
+    public SpaceMarine remove_last(String owner){
         synchronized (monitor) {
             if (stack.isEmpty()) {
                 throw new EmptyStackException();
             }
             SpaceMarine last = stack.get(stack.size() - 1);
-            int deletedId = dbManager.deleteLastSpaceMarine();
+            checkOwnership(last, owner, "remove_last", last.getID());
+
+            int deletedId = dbManager.deleteLastSpaceMarine(owner);
             if (deletedId == last.getID()) {
                 stack.remove(stack.size() - 1);
                 return last;
@@ -195,15 +220,19 @@ public class CollectionController implements Cloneable {
     }
 
     /**
-     * Удалить все элементы, большие переданного (сравнение по id).
-     * Сначала массовое удаление в БД, при успехе — удаление из памяти.
+     * Удалить все элементы, id которых больше id переданного элемента.
+     * Удаляются только элементы, принадлежащие данному owner.
+     * Сначала массовое удаление в БД (с фильтром owner), при успехе — из памяти.
+     *
+     * @param element элемент-порог для сравнения
+     * @param owner   имя пользователя, выполняющего операцию
      */
-    public void removeGreater(SpaceMarine element){
+    public void removeGreater(SpaceMarine element, String owner){
         synchronized (monitor) {
-            int deleted = dbManager.deleteSpaceMarinesWithIdGreaterThan(element.getID());
+            int deleted = dbManager.deleteSpaceMarinesWithIdGreaterThan(element.getID(), owner);
             if (deleted >= 0) {
                 List<SpaceMarine> toRemove = stack.stream()
-                        .filter(x -> x.compareTo(element) > 0)
+                        .filter(x -> x.compareTo(element) > 0 && x.getOwner().equals(owner))
                         .toList();
                 stack.removeAll(toRemove);
             } else {
@@ -212,8 +241,74 @@ public class CollectionController implements Cloneable {
         }
     }
 
+    /**
+     * Очистить коллекцию. Удаляются только элементы, принадлежащие данному owner.
+     * Сначала DELETE из БД, при успехе — очистка в памяти.
+     *
+     * @param owner имя пользователя, выполняющего операцию
+     */
+    public void clear(String owner){
+        dbManager.deleteSpaceMarinesByOwner(owner);
+        synchronized (monitor) {
+            stack.removeIf(x -> x.getOwner().equals(owner));
+        }
+    }
+
+    // ============================================================
+    //  Вспомогательные методы
+    // ============================================================
+
+    /**
+     * Найти элемент по id в памяти (без блокировки — вызывать внутри synchronized).
+     */
+    private SpaceMarine findElementById(int id) {
+        for (SpaceMarine marine : stack) {
+            if (marine.getID() == id) {
+                return marine;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Проверить, что переданный owner является хозяином объекта.
+     *
+     * @param marine     объект коллекции
+     * @param owner      имя пользователя, пытающегося выполнить операцию
+     * @param operation  название операции (для логирования)
+     * @param id         id объекта (для логирования)
+     * @throws SecurityException если owner не совпадает с хозяином
+     */
+    private void checkOwnership(SpaceMarine marine, String owner, String operation, int id) {
+        if (!marine.getOwner().equals(owner)) {
+            logger.warn("Попытка {} для id={} от пользователя '{}' (хозяин: '{}').",
+                    operation, id, owner, marine.getOwner());
+            throw new SecurityException(
+                    "Ошибка: пользователь '" + owner + "' не является хозяином SpaceMarine id=" + id
+                            + ". Хозяин: '" + marine.getOwner() + "'. Операция отклонена."
+            );
+        }
+    }
+
+    // ============================================================
+    //  Служебные методы
+    // ============================================================
+
     public int getCollectionSize(){
         return stack.size();
+    }
+
+    /**
+     * Сохранение коллекции.
+     * При использовании БД все изменения сохраняются автоматически при каждой
+     * модифицирующей операции. Метод оставлен для обратной совместимости.
+     */
+    public void save(String fileName){
+        logger.info("save() вызван. При использовании БД коллекция сохраняется автоматически.");
+    }
+
+    public void save(){
+        save(null);
     }
 
     @Override

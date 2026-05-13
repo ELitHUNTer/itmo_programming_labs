@@ -32,9 +32,11 @@ public class CommandManager {
         commands.put("remove_last", new RemoveLastCommand(collection));
         commands.put("save", new SaveCommand(collection));
         commands.put("update", new UpdateIdCommand(collection));
+        commands.put("login", new Login());
+        commands.put("register", new Register());
         commands.put("u?", new Command() {
             @Override
-            public String execute(String... args) {
+            public String execute(String name, String... args) {
                 StringBuilder sb = new StringBuilder();
                 collection.getCollectionElements().stream().map(SpaceMarine::getID).forEach(x -> sb.append(x).append(" "));
                 return sb.toString();
@@ -55,32 +57,32 @@ public class CommandManager {
      * @param commandName name of command
      * @param commandArgs argument to pass for a command
      */
-    public String executeCommand(String commandName, String... commandArgs){
+    public String executeCommand(String userName, String commandName, String... commandArgs){
         if (!commands.containsKey(commandName) || commandName.equals("save"))
             //throw new IllegalArgumentException("No command found for name " + commandName + ". Please type help for help");
             return "No command found for name " + commandName + ". Please type help for help";
         logger.info("Provided command: " + commandName);
         try {
-            return commands.get(commandName).execute(commandArgs);
+            return commands.get(commandName).execute(userName, commandArgs);
         } catch (Exception ex){
             //ex.printStackTrace();
             return ex.getMessage();
         }
     }
 
-    public String executeSaveForServer(String... commandArgs){
-        return commands.get("save").execute(commandArgs);
-    }
+//    public String executeSaveForServer(int user_id, String... commandArgs){
+//        return commands.get("save").execute(int user_id, commandArgs);
+//    }
 
     /**
      * Parses line and starts execution of a command
      * @param unparsedLine command and args in unparsed format
      */
-    public String executeCommand(String unparsedLine){
+    public String executeCommand(String userName, String unparsedLine){
         String[] arr = unparsedLine.trim().split(" ");
         if (arr.length == 0)
             return "";
-        return executeCommand(arr[0], Arrays.copyOfRange(arr, 1, arr.length));
+        return executeCommand(userName, arr[0], Arrays.copyOfRange(arr, 1, arr.length));
     }
 
 }

@@ -57,6 +57,8 @@ public class SpaceMarineAdapter extends TypeAdapter<SpaceMarine> {
         out.name("chapter");
         chapterAdapter.write(out, value.getChapter());
 
+        out.name("owner").value(value.getOwner());
+
         out.endObject();
     }
 
@@ -78,6 +80,7 @@ public class SpaceMarineAdapter extends TypeAdapter<SpaceMarine> {
         Weapon weaponType = null;
         MeleeWeapon meleeWeapon = null;
         Chapter chapter = null;
+        String owner = null;
 
         while (in.hasNext()) {
             String fieldName = in.nextName();
@@ -133,6 +136,9 @@ public class SpaceMarineAdapter extends TypeAdapter<SpaceMarine> {
                 case "chapter":
                     chapter = chapterAdapter.read(in);
                     break;
+                case "owner":
+                    owner = in.nextString();
+                    break;
                 default:
                     in.skipValue();
                     break;
@@ -160,7 +166,8 @@ public class SpaceMarineAdapter extends TypeAdapter<SpaceMarine> {
                 category,
                 weaponType,
                 meleeWeapon,
-                chapter
+                chapter,
+                owner
         );
     }
 }

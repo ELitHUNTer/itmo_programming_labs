@@ -10,11 +10,11 @@ public class RemoveByIdCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         try {
 
             int id = Integer.parseInt(args[0]);
-            controller.removeById(id);
+            controller.removeById(id, userName);
             //IOHelper.printlnIfUsingConsole("Элемент удален");
             return "Элемент удален";
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException ex){

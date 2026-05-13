@@ -10,8 +10,8 @@ public class ClearCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
-        controller.clear();
+    public String execute(String userName, String... args) {
+        controller.clear(userName);
         //IOHelper.printlnIfUsingConsole("Коллекция очищена");
         return "Коллекция очищена";
     }

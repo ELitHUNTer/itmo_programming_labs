@@ -147,7 +147,7 @@ public class IOHelper {
 
         chapter = readChapter();
 
-        return new SpaceMarine(name, coordinates, health, category, weaponType, meleeWeapon, chapter);
+        return new SpaceMarine(name, coordinates, health, category, weaponType, meleeWeapon, chapter, "TEMP");
     }
 
     /**

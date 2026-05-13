@@ -10,7 +10,7 @@ public class FilterStartsWithNameCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         try {
             StringBuilder sb = new StringBuilder();
             controller.getCollectionElements().stream()

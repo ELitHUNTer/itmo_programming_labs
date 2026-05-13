@@ -12,9 +12,9 @@ public class RemoveGreaterCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         SpaceMarine origin = IOHelper.readMarine();
-        controller.removeGreater(origin);
+        controller.removeGreater(origin, userName);
         //IOHelper.printlnIfUsingConsole("Элементы удалены");
         return "Элементы удалены";
     }

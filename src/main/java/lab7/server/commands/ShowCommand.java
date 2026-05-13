@@ -10,7 +10,7 @@ public class ShowCommand extends CollectionCommand {
     }
 
     @Override
-    public String execute(String... args) {
+    public String execute(String userName, String... args) {
         StringBuilder sb = new StringBuilder();
         //controller.getCollectionElements().forEach(IOHelper.consoleOut::println);
         controller.getCollectionElements().forEach(x -> {
