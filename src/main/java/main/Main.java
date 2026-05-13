@@ -5,6 +5,7 @@ import lab2.Lab2Main;
 import lab3.Lab3Main;
 import lab5.Lab5Main;
 import lab6.Lab6Main;
+import lab7.Lab7Main;
 
 public class Main {
 
@@ -35,6 +36,8 @@ public class Main {
             case "5" -> new Lab5Main();
             case "6c" -> new Lab6Main(false);
             case "6s" -> new Lab6Main(true);
+            case "7c" -> new Lab7Main(false);
+            case "7s" -> new Lab7Main(true);
             default -> throw new IllegalArgumentException(String.format("Work with id = %d doesn't exist", id));
         };
     }
